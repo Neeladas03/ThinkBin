@@ -1,8 +1,9 @@
 import { Link ,useNavigate} from "react-router-dom"
 import {IoIosArrowBack} from "react-icons/io"
 import { useState } from "react"
-import {v4 as uuid} from 'uuid'
+
 import useCreateDate from "../components/useCreateDate"
+import * as notesApi from "../services/notes";
 
 const CreateNote = ({setNotes}) => {
   const [title,setTitle]=useState('')
@@ -10,13 +11,18 @@ const CreateNote = ({setNotes}) => {
   const date=useCreateDate();
   const navigate=useNavigate();
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    if(title && details){
-      const note ={id:uuid(),title,details,date}
-      setNotes(prevNotes=>[note, ...prevNotes])
-      navigate("/")
+
+    if (title && details) {
+      try {
+        const newNote = await notesApi.create({ title, details, date });
+        setNotes((prev) => [newNote, ...prev]);
+        navigate("/");
+      } catch (err) {
+        console.error(err);
+        alert("Could not save note");
+      }
     }
   }
 

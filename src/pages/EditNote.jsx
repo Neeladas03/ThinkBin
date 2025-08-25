@@ -3,10 +3,11 @@ import { IoIosArrowBack } from "react-icons/io";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useState } from "react";
 import useCreateDate from "../components/useCreateDate";
+import * as notesApi from "../services/notes";
 
 const EditNote = ({ notes, setNotes }) => {
   const { id } = useParams();
-  const note = notes.find((item) => item.id === id);
+  const note = notes.find((item) => item._id === id);
 
   // Ensure safe state initialization
   const [title, setTitle] = useState(note ? note.title : "");
@@ -14,27 +15,27 @@ const EditNote = ({ notes, setNotes }) => {
   const date = useCreateDate();
   const navigate = useNavigate();
 
-  const handleForm = (e) => {
+  const handleForm = async (e) => {
     e.preventDefault();
     if (title && details) {
-      const newNote = { ...note, title, details, date };
+      const updated = await notesApi.update(id, { title, details, date });
       const newNotes = notes.map((item) =>
-        item.id === id ? newNote : item
+        item._id === id ? updated : item
       );
       setNotes(newNotes);
       navigate("/"); // Navigate after saving
     }
   };
 
-  const handleDelete = () => {
-    if(window.confirm("Are you sure you want to delete?")){
-      const newNotes = notes.filter((item) => item.id !== id);
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete?")) {
+      await notesApi.remove(id);
+      const newNotes = notes.filter((item) => item._id !== id);
       setNotes(newNotes);
       navigate("/");
     }
   };
 
-  
   if (!note) {
     return <p>Note not found</p>;
   }

@@ -3,21 +3,18 @@ import Notes from "./pages/Notes";
 import CreateNote from "./pages/CreateNote";
 import EditNote from "./pages/EditNote";
 import { useEffect, useState } from "react";
+import * as notesApi from "./services/notes";
 
 const App = () => {
-  // Ensure `localStorage.getItem("notes")` doesn't return `null`
-  const [notes, setNotes] = useState(() => {
-    const savedNotes = localStorage.getItem("notes");
-    return savedNotes ? JSON.parse(savedNotes) : [];
-  });
+  const [notes, setNotes] = useState([]);
 
-  // Save `notes` to localStorage only when it actually changes
+  // Fetch notes from backend once on mount
   useEffect(() => {
-    const savedNotes = JSON.stringify(notes);
-    if (savedNotes !== localStorage.getItem("notes")) {
-      localStorage.setItem("notes", savedNotes);
-    }
-  }, [notes]);
+    notesApi
+      .getAll()
+      .then(setNotes)
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <main id="app">
