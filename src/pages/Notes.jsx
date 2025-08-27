@@ -37,7 +37,7 @@ const Notes = ({ notes }) => {
             </header>
             <div className="notes__container">
                 {filteredNotes.map(note => (
-                    <NoteItem key={note.id} note={note} />
+                    <NoteItem key={note._id} note={note} />
                 ))}
             </div>
             <Link to="/create-note" className="btn add__btn">

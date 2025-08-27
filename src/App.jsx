@@ -10,10 +10,26 @@ const App = () => {
 
   // Fetch notes from backend once on mount
   useEffect(() => {
-    notesApi
-      .getAll()
-      .then(setNotes)
-      .catch((err) => console.error(err));
+    const fetchNotes = async () => {
+      try {
+        console.log('Fetching notes from API...');
+        const data = await notesApi.getAll();
+        console.log('Successfully fetched notes:', data);
+        console.log('First note structure:', data[0]);
+        console.log('First note ID:', data[0]?._id || data[0]?.id);
+        setNotes(data);
+      } catch (err) {
+        console.error('Error in fetchNotes:', err);
+        if (err.response) {
+          console.error('Response status:', err.response.status);
+          err.response.text().then(text => {
+            console.error('Response body:', text);
+          });
+        }
+      }
+    };
+
+    fetchNotes();
   }, []);
 
   return (
